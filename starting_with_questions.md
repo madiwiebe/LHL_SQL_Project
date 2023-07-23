@@ -9,34 +9,61 @@ Step 2: Calculate transaction revenue by combining quantity data from sales_repo
 
 SQL Queries:
 
-    SELECT	als.country,
-		SUM(sr.total_ordered*als.productprice) AS prod_revenue
-    FROM all_sessions_clean als
-    JOIN sales_report_clean sr ON als.productsku = sr.productsku
-    GROUP BY country
-    ORDER BY prod_revenue DESC
-    LIMIT 3;
+Country:
 
-    SELECT	als.city,
-			SUM(sr.total_ordered*als.productprice) AS prod_revenue
+ 	WITH	calc_revenue AS(
+			SELECT	visitid,
+				"time",
+				productsku,
+				productquantity,
+				productprice,
+				((CASE	WHEN productquantity IS NULL THEN 0
+			  		WHEN productquantity IS NOT NULL THEN productquantity
+			  	  END) * productprice) AS prod_revenue
+			FROM all_sessions_clean
+			)
+	
+	SELECT	als.country,
+		SUM(cr.prod_revenue) AS total_transaction_revenue
 	FROM all_sessions_clean als
-	JOIN sales_report_clean sr ON als.productsku = sr.productsku
+	JOIN calc_revenue cr USING(visitid, "time", productsku)
+	GROUP BY als.country
+	ORDER BY total_transaction_revenue DESC
+	LIMIT 3;
+ City:
+
+	WITH	calc_revenue AS(
+			SELECT	visitid,
+				"time",
+				productsku,
+				productquantity,
+				productprice,
+				((CASE WHEN productquantity IS NULL THEN 0
+					WHEN productquantity IS NOT NULL THEN productquantity
+				  END) * productprice) AS prod_revenue
+			FROM all_sessions_clean
+			)
+	
+	SELECT	als.city,
+		SUM(cr.prod_revenue) AS total_transaction_revenue
+	FROM all_sessions_clean als
+	JOIN calc_revenue cr USING(visitid, "time", productsku)
 	GROUP BY city
 	HAVING als.city <> 'not available in demo dataset'
-	ORDER BY prod_revenue DESC
-    LIMIT 3;
+	ORDER BY total_transaction_revenue DESC
+	LIMIT 3;
     
 Answer:
 
 The three countries with the highest total transaction revenue are:
-1. United States      (5,367,386.59 USD)
-2. United Kingdom     (257,003.62 USD)
-3. Canada             (171,816.09 USD)
+1. United States	(5,435.73 USD)
+2. Ireland     		(99.99 USD)
+3. Argentina		(99.99 USD)
 
 The three cities with the highest total transaction revenue are:
-1. Mountain View (1,251,680.65 USD)
-2. San Francisco (378,883.06 USD)
-3. Sunnyvale (351,486.09 USD)
+1. Mountain View 	(785.97 USD)
+2. Salem 		(639.36 USD)
+3. New York 		(590.56 USD)
    
 
     
