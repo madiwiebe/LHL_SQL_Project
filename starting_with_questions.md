@@ -173,14 +173,373 @@ The largest average number of products ordered from a city is associated with De
 
 **Question 3: Is there any pattern in the types (product categories) of products ordered from visitors in each city and country?**
 
+Step 1: Use standardized category name CTE developed during data cleaning to create more uniform category and subcategory names for products.
+
+Step 2: Identify visitids associated with orders (shared_visitid CTE).
+
+Step 3: Group the relevant visitids by country.
+
+Step 4: Identify productsku records associated with the relevant visitids.
+
+Step 5: Identify the category associated with those productskus
+
+Step 6: Count how many instances of each category are present in orders for each country.
+
+Step 7: Repeat steps 3-6 for city records.
+
+Step 8: Explore data further.
+
 
 SQL Queries:
 
+Country:
+
+	WITH 
+	cleaned_categories AS(
+		SELECT	DISTINCT(productsku),
+			product_name,
+			v2productcategory,
+			CASE
+				WHEN product_name LIKE '%Bottle%' THEN 'Drinkware'
+				WHEN product_name LIKE '%Mug%' THEN 'Drinkware'
+				WHEN product_name LIKE '%Tumbler%' THEN 'Drinkware'
+				WHEN product_name LIKE '%Women%' THEN 'Apparel'
+				WHEN product_name LIKE '%Men%' THEN 'Apparel'
+				WHEN product_name LIKE '%Kid%' THEN 'Apparel'
+				WHEN product_name LIKE '%Bag%' THEN 'Bags'
+				WHEN product_name LIKE '%Backpack%' THEN 'Bags'
+				WHEN product_name LIKE '%Rucksack%' THEN 'Bags'
+				WHEN product_name LIKE '%Pen%' THEN 'Office'
+				WHEN product_name LIKE '%Journal%' THEN 'Office'
+				WHEN product_name LIKE '%Gift%Card%' THEN 'Gift Cards'
+				WHEN product_name LIKE '%Android%' THEN 'Shop by Brand' 
+				WHEN product_name LIKE '%You%Tube%' THEN 'Shop by Brand' 
+				WHEN product_name LIKE '%Nest%' THEN 'Shop by Brand' 
+				WHEN product_name LIKE '%Waze%' THEN 'Shop by Brand'
+				WHEN product_name LIKE '%Google%' THEN 'Shop by Brand'
+				WHEN product_name LIKE '%Flashlight%' THEN 'Electronics'
+				WHEN product_name LIKE '%Charger%' THEN 'Electronics'
+				WHEN product_name LIKE '%Yoga%' THEN 'Accessories'
+				ELSE CASE
+					WHEN v2productcategory LIKE '%Apparel%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Electronics%' THEN 'Electronics'
+					WHEN v2productcategory LIKE '%Housewares%' THEN 'Housewares'
+					WHEN v2productcategory LIKE '%Drinkware%' THEN 'Drinkware'
+					WHEN v2productcategory LIKE '%Accessories%' THEN 'Accessories'
+					WHEN v2productcategory LIKE '%Bags%' THEN 'Bags'
+					WHEN v2productcategory LIKE '%Office%' THEN 'Office'
+					WHEN v2productcategory LIKE '%Lifestyle%' THEN 'Lifestyle'
+					WHEN v2productcategory LIKE '%Sale%' THEN 'Sale'
+					WHEN v2productcategory LIKE '%Headgear%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Wearables%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Limited Supply%' THEN 'Limited Supply'
+					WHEN v2productcategory LIKE '%Gift Cards%' THEN 'Gift Cards'
+					WHEN v2productcategory LIKE '%Fun%' THEN 'Lifestyle'
+					WHEN v2productcategory LIKE '%Bottle%' THEN 'Drinkware'
+					WHEN v2productcategory LIKE '%Kids%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Android%' THEN 'Shop by Brand' 
+					WHEN v2productcategory LIKE '%You%Tube%' THEN 'Shop by Brand' 
+					WHEN v2productcategory LIKE '%Nest%' THEN 'Shop by Brand' 
+					WHEN v2productcategory LIKE '%Waze%' THEN 'Shop by Brand'
+					WHEN v2productcategory LIKE '%Google%' THEN 'Shop by Brand'
+					WHEN v2productcategory LIKE '%Brand%' THEN 'Shop by Brand'
+					WHEN v2productcategory LIKE '%Fruit Games%' THEN 'Shop by Brand'
+					ELSE 'Miscellaneous'
+					END
+			END category
+			,
+			CASE 
+				WHEN product_name LIKE '%Bottle%' THEN 'Water Bottles & Tumblers'
+				WHEN product_name LIKE '%Mug%' THEN 'Mugs & Cups'
+				WHEN product_name LIKE '%Tumbler%' THEN 'Water Bottles & Tumblers'
+				WHEN product_name LIKE '%Women%' THEN 'Women''s'
+				WHEN product_name LIKE '%Men%' THEN 'Men''s'
+				WHEN product_name LIKE '%Kid%' THEN 'Kid''s'
+				WHEN product_name LIKE '%Pen%' THEN 'Writing Instruments'
+				WHEN product_name LIKE '%Note%' THEN 'Notebooks & Journals'
+				WHEN product_name LIKE '%Journal%' THEN 'Notebooks & Journals'
+				WHEN product_name LIKE '%Tote%' THEN 'Shopping & Totes'
+				WHEN product_name LIKE '%Shopping%' THEN 'Shopping & Totes'
+				WHEN product_name LIKE '%Backpack%' THEN 'Backpacks'
+				WHEN product_name LIKE '%Rucksack%' THEN 'Backpacks'
+				WHEN product_name LIKE '%Flashlight%' THEN 'Flashlights'
+				WHEN product_name LIKE '%Charger%' THEN 'Power'
+				WHEN product_name LIKE '%Yoga%' THEN 'Sports & Fitness'
+				WHEN product_name LIKE '%Android%' THEN 'Android' 
+				WHEN product_name LIKE '%You%Tube%' THEN 'YouTube' 
+				WHEN product_name LIKE '%Nest%' THEN 'Nest' 
+				WHEN product_name LIKE '%Waze%' THEN 'Waze'
+				WHEN product_name LIKE '%Google%' THEN 'Google'
+				ELSE CASE 
+					WHEN v2productcategory LIKE '%Kid%Infant%' THEN 'Kid''s-Infant'
+					WHEN v2productcategory LIKE '%Kid%Toddler%' THEN 'Kids''s-Toddler'
+					WHEN v2productcategory LIKE '%Kid%Youth%' THEN 'Kids''s-Youth'
+					WHEN v2productcategory LIKE '%Kid%' THEN 'Kid''s'
+					WHEN v2productcategory LIKE '%Women%' THEN 'Women''s'
+					WHEN v2productcategory LIKE '%Men%' THEN 'Men''s'
+					WHEN v2productcategory LIKE '%Headgear%' THEN 'Headgear'
+					WHEN v2productcategory LIKE '%Audio%' THEN 'Audio'
+					WHEN v2productcategory LIKE '%Power%' THEN 'Power'
+					WHEN v2productcategory LIKE '%Flashlights%' THEN 'Flashlights'
+					WHEN v2productcategory LIKE '%Mugs%' THEN 'Mugs & Cups'
+					WHEN v2productcategory LIKE '%Bottle%' THEN 'Water Bottles & Tumblers'
+					WHEN v2productcategory LIKE '%Sport%' THEN 'Sports & Fitness'
+					WHEN v2productcategory LIKE '%Fun%' THEN 'Fun'
+					WHEN v2productcategory LIKE '%Shopping%' THEN 'Shopping & Totes'
+					WHEN v2productcategory LIKE '%Tote%' THEN 'Shopping & Totes'
+					WHEN v2productcategory LIKE '%Backpack%' THEN 'Backpacks'
+					WHEN v2productcategory LIKE '%Writing%' THEN 'Writing Instruments'
+					WHEN v2productcategory LIKE '%Note%' THEN 'Notebooks & Journals'
+					WHEN v2productcategory LIKE '%Android%' THEN 'Android' 
+					WHEN v2productcategory LIKE '%YouTube%' THEN 'YouTube' 
+					WHEN v2productcategory LIKE '%Nest%' THEN 'Nest' 
+					WHEN v2productcategory LIKE '%Waze%' THEN 'Waze'
+					WHEN v2productcategory LIKE '%Google%' THEN 'Google'
+					WHEN v2productcategory LIKE '%Fruit Games%' THEN 'Fruit Games'
+					ELSE 'N/A'
+					END
+				END subcategory 				
+		FROM all_sessions_clean
+		ORDER BY category, subcategory
+		)
+	,
+	shared_visitids AS(
+		SELECT	DISTINCT(als.visitid) AS visitid,
+				als.country
+		FROM all_sessions_clean als
+		JOIN analytics_clean_sales_info acsi
+		ON als.visitid = acsi.visitid
+		)
+	,
+	visit_products AS(
+		SELECT	als.visitid,
+				als.productsku
+		FROM shared_visitids sv
+		JOIN all_sessions_clean als
+		ON sv.visitid = als.visitid
+		)
+	,
+	orders_by_country AS(
+		SELECT	sv.visitid,
+			sv.country,
+			vp.productsku,
+			cc.category,
+			COUNT(*) OVER(PARTITION BY country, category) AS num_products_ordered
+		FROM shared_visitids sv
+		JOIN visit_products vp ON sv.visitid = vp.visitid
+		JOIN cleaned_categories cc ON vp.productsku = cc.productsku
+		WHERE country NOT LIKE '%not set%'	
+		)
+
+	SELECT	DISTINCT(obc.country),
+		obc.category,
+		obc.num_products_ordered
+  	INTO TEMPORARY TABLE order_categories_by_country
+	FROM orders_by_country obc
+	ORDER BY country, num_products_ordered, category;
+
+City:
+
+	WITH 
+	cleaned_categories AS(
+		SELECT	DISTINCT(productsku),
+			product_name,
+			v2productcategory,
+			CASE
+				WHEN product_name LIKE '%Bottle%' THEN 'Drinkware'
+				WHEN product_name LIKE '%Mug%' THEN 'Drinkware'
+				WHEN product_name LIKE '%Tumbler%' THEN 'Drinkware'
+				WHEN product_name LIKE '%Women%' THEN 'Apparel'
+				WHEN product_name LIKE '%Men%' THEN 'Apparel'
+				WHEN product_name LIKE '%Kid%' THEN 'Apparel'
+				WHEN product_name LIKE '%Bag%' THEN 'Bags'
+				WHEN product_name LIKE '%Backpack%' THEN 'Bags'
+				WHEN product_name LIKE '%Rucksack%' THEN 'Bags'
+				WHEN product_name LIKE '%Pen%' THEN 'Office'
+				WHEN product_name LIKE '%Journal%' THEN 'Office'
+				WHEN product_name LIKE '%Gift%Card%' THEN 'Gift Cards'
+				WHEN product_name LIKE '%Android%' THEN 'Shop by Brand' 
+				WHEN product_name LIKE '%You%Tube%' THEN 'Shop by Brand' 
+				WHEN product_name LIKE '%Nest%' THEN 'Shop by Brand' 
+				WHEN product_name LIKE '%Waze%' THEN 'Shop by Brand'
+				WHEN product_name LIKE '%Google%' THEN 'Shop by Brand'
+				WHEN product_name LIKE '%Flashlight%' THEN 'Electronics'
+				WHEN product_name LIKE '%Charger%' THEN 'Electronics'
+				WHEN product_name LIKE '%Yoga%' THEN 'Accessories'
+				ELSE CASE
+					WHEN v2productcategory LIKE '%Apparel%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Electronics%' THEN 'Electronics'
+					WHEN v2productcategory LIKE '%Housewares%' THEN 'Housewares'
+					WHEN v2productcategory LIKE '%Drinkware%' THEN 'Drinkware'
+					WHEN v2productcategory LIKE '%Accessories%' THEN 'Accessories'
+					WHEN v2productcategory LIKE '%Bags%' THEN 'Bags'
+					WHEN v2productcategory LIKE '%Office%' THEN 'Office'
+					WHEN v2productcategory LIKE '%Lifestyle%' THEN 'Lifestyle'
+					WHEN v2productcategory LIKE '%Sale%' THEN 'Sale'
+					WHEN v2productcategory LIKE '%Headgear%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Wearables%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Limited Supply%' THEN 'Limited Supply'
+					WHEN v2productcategory LIKE '%Gift Cards%' THEN 'Gift Cards'
+					WHEN v2productcategory LIKE '%Fun%' THEN 'Lifestyle'
+					WHEN v2productcategory LIKE '%Bottle%' THEN 'Drinkware'
+					WHEN v2productcategory LIKE '%Kids%' THEN 'Apparel'
+					WHEN v2productcategory LIKE '%Android%' THEN 'Shop by Brand' 
+					WHEN v2productcategory LIKE '%You%Tube%' THEN 'Shop by Brand' 
+					WHEN v2productcategory LIKE '%Nest%' THEN 'Shop by Brand' 
+					WHEN v2productcategory LIKE '%Waze%' THEN 'Shop by Brand'
+					WHEN v2productcategory LIKE '%Google%' THEN 'Shop by Brand'
+					WHEN v2productcategory LIKE '%Brand%' THEN 'Shop by Brand'
+					WHEN v2productcategory LIKE '%Fruit Games%' THEN 'Shop by Brand'
+					ELSE 'Miscellaneous'
+					END
+			END category
+			,
+			CASE 
+				WHEN product_name LIKE '%Bottle%' THEN 'Water Bottles & Tumblers'
+				WHEN product_name LIKE '%Mug%' THEN 'Mugs & Cups'
+				WHEN product_name LIKE '%Tumbler%' THEN 'Water Bottles & Tumblers'
+				WHEN product_name LIKE '%Women%' THEN 'Women''s'
+				WHEN product_name LIKE '%Men%' THEN 'Men''s'
+				WHEN product_name LIKE '%Kid%' THEN 'Kid''s'
+				WHEN product_name LIKE '%Pen%' THEN 'Writing Instruments'
+				WHEN product_name LIKE '%Note%' THEN 'Notebooks & Journals'
+				WHEN product_name LIKE '%Journal%' THEN 'Notebooks & Journals'
+				WHEN product_name LIKE '%Tote%' THEN 'Shopping & Totes'
+				WHEN product_name LIKE '%Shopping%' THEN 'Shopping & Totes'
+				WHEN product_name LIKE '%Backpack%' THEN 'Backpacks'
+				WHEN product_name LIKE '%Rucksack%' THEN 'Backpacks'
+				WHEN product_name LIKE '%Flashlight%' THEN 'Flashlights'
+				WHEN product_name LIKE '%Charger%' THEN 'Power'
+				WHEN product_name LIKE '%Yoga%' THEN 'Sports & Fitness'
+				WHEN product_name LIKE '%Android%' THEN 'Android' 
+				WHEN product_name LIKE '%You%Tube%' THEN 'YouTube' 
+				WHEN product_name LIKE '%Nest%' THEN 'Nest' 
+				WHEN product_name LIKE '%Waze%' THEN 'Waze'
+				WHEN product_name LIKE '%Google%' THEN 'Google'
+				ELSE CASE 
+					WHEN v2productcategory LIKE '%Kid%Infant%' THEN 'Kid''s-Infant'
+					WHEN v2productcategory LIKE '%Kid%Toddler%' THEN 'Kids''s-Toddler'
+					WHEN v2productcategory LIKE '%Kid%Youth%' THEN 'Kids''s-Youth'
+					WHEN v2productcategory LIKE '%Kid%' THEN 'Kid''s'
+					WHEN v2productcategory LIKE '%Women%' THEN 'Women''s'
+					WHEN v2productcategory LIKE '%Men%' THEN 'Men''s'
+					WHEN v2productcategory LIKE '%Headgear%' THEN 'Headgear'
+					WHEN v2productcategory LIKE '%Audio%' THEN 'Audio'
+					WHEN v2productcategory LIKE '%Power%' THEN 'Power'
+					WHEN v2productcategory LIKE '%Flashlights%' THEN 'Flashlights'
+					WHEN v2productcategory LIKE '%Mugs%' THEN 'Mugs & Cups'
+					WHEN v2productcategory LIKE '%Bottle%' THEN 'Water Bottles & Tumblers'
+					WHEN v2productcategory LIKE '%Sport%' THEN 'Sports & Fitness'
+					WHEN v2productcategory LIKE '%Fun%' THEN 'Fun'
+					WHEN v2productcategory LIKE '%Shopping%' THEN 'Shopping & Totes'
+					WHEN v2productcategory LIKE '%Tote%' THEN 'Shopping & Totes'
+					WHEN v2productcategory LIKE '%Backpack%' THEN 'Backpacks'
+					WHEN v2productcategory LIKE '%Writing%' THEN 'Writing Instruments'
+					WHEN v2productcategory LIKE '%Note%' THEN 'Notebooks & Journals'
+					WHEN v2productcategory LIKE '%Android%' THEN 'Android' 
+					WHEN v2productcategory LIKE '%YouTube%' THEN 'YouTube' 
+					WHEN v2productcategory LIKE '%Nest%' THEN 'Nest' 
+					WHEN v2productcategory LIKE '%Waze%' THEN 'Waze'
+					WHEN v2productcategory LIKE '%Google%' THEN 'Google'
+					WHEN v2productcategory LIKE '%Fruit Games%' THEN 'Fruit Games'
+					ELSE 'N/A'
+					END
+				END subcategory 				
+		FROM all_sessions_clean
+		ORDER BY category, subcategory
+		)
+	,
+	shared_visitids AS(
+		SELECT	DISTINCT(als.visitid) AS visitid,
+				als.city
+		FROM all_sessions_clean als
+		JOIN analytics_clean_sales_info acsi
+		ON als.visitid = acsi.visitid
+		)
+	,
+	visit_products AS(
+		SELECT	als.visitid,
+			als.productsku
+		FROM shared_visitids sv
+		JOIN all_sessions_clean als
+		ON sv.visitid = als.visitid
+		)
+	,
+	orders_by_city AS(
+		SELECT	sv.visitid,
+			sv.city,
+			vp.productsku,
+			cc.category,
+			COUNT(*) OVER(PARTITION BY city, category) AS num_products_ordered
+		FROM shared_visitids sv
+		JOIN visit_products vp ON sv.visitid = vp.visitid
+		JOIN cleaned_categories cc ON vp.productsku = cc.productsku
+		WHERE city <> 'not available in demo dataset' AND (city NOT LIKE '%not set%') AND city IS NOT NULL	
+		)
+
+	SELECT	DISTINCT(obc.city),
+		obc.category,
+		obc.num_products_ordered
+	INTO TEMPORARY TABLE order_categories_by_city
+	FROM orders_by_city obc
+	ORDER BY city, num_products_ordered, category;
+
+
+
+Further exploration (countries):
+
+	--number of countries that have ordered from a given category
+	SELECT	DISTINCT(category),
+	COUNT(*) OVER(PARTITION BY category) AS num_countries
+	FROM order_categories_by_country
+	ORDER BY num_countries DESC;
+
+	--number of distinct categories
+	SELECT DISTINCT(category)
+	FROM order_categories_by_country;
+
+	--number of unique categories that each country has ordered products from
+	SELECT	DISTINCT(country),
+		COUNT(*) OVER(PARTITION BY country) AS num_categories
+	FROM order_categories_by_country
+	ORDER BY num_categories DESC;
+
+	--total number of units sold from within each category 
+	SELECT	DISTINCT(category),
+		SUM(num_products_ordered) OVER (PARTITION BY category) AS units_sold
+	FROM order_categories_by_country
+	GROUP BY category, num_products_ordered
+	ORDER BY units_sold DESC;
+
+Futher exploration (cities): 
+
+	--number of cities that have ordered from a given category
+ 	SELECT	DISTINCT(category),
+		COUNT(*) OVER(PARTITION BY category) AS num_cities
+	FROM order_categories_by_city
+	ORDER BY num_cities DESC;
+
+	--number of distinct categories
+	SELECT DISTINCT(category)
+	FROM order_categories_by_city;
+
+	--number of unique categories that each city has ordered products from
+	SELECT	DISTINCT(city),
+		COUNT(*) OVER(PARTITION BY city) AS num_categories
+	FROM order_categories_by_city
+	ORDER BY num_categories DESC;
+
+	--total number of units sold from within each category 
+	SELECT	DISTINCT(category),
+		SUM(num_products_ordered) OVER (PARTITION BY category) AS units_sold
+	FROM order_categories_by_city
+	GROUP BY category, num_products_ordered
+	ORDER BY units_sold DESC;
 
 
 Answer:
 
-
+Of the 13 distinct categories, the category that is most commonly ordered from is Shop by Brand (81 countries, 102 cities), closely followed by Apparel (76 countries, 92 cities). The United States has ordered products from all 13 categories, while the highest number of categories a single city has ordered from is 12 (a three-way tie between New York, Mountain View, and Sunnyvale). The category having the most overall units sold is Apparel (6023 units recorded for sales by country, 2067 units recorded for sales by city).
 
 
 
