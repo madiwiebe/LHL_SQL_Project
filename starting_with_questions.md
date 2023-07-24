@@ -545,14 +545,93 @@ Of the 13 distinct categories, the category that is most commonly ordered from i
 
 **Question 4: What is the top-selling product from each city/country? Can we find any pattern worthy of noting in the products sold?**
 
+Step 1: Define "top-selling" as "largest number of units sold".
+
+Step 2: Retrieve product details for orders made in distinct countries.
+
+Step 3: Rank productskus within each country's orders based on highest quantity sold.
+
+Step 4: Identify the products having a rank of 1 for each country.
+
+Step 5: Repeat steps 2-4 for city records.
 
 SQL Queries:
 
+Country:
 
+	WITH country_product_sales AS(
+		SELECT	als.country,
+			als.productsku,
+			als.product_name,
+			als.productquantity,
+			als.productprice,
+			(als.productquantity * als.productprice) AS revenue
+		FROM all_sessions_clean als
+		WHERE productquantity IS NOT NULL
+		AND country NOT LIKE '%not set%'
+		)
+		,
+	country_product_ranks AS(
+		SELECT	cps.country,
+			cps.productsku,
+			cps.productquantity,
+			DENSE_RANK() OVER (
+					   PARTITION BY country 
+					   ORDER BY cps.productquantity DESC
+					  ) AS selling_rank
+		FROM country_product_sales cps
+		)
+
+	SELECT	DISTINCT(cps.country),
+		cps.productsku,
+		cps.product_name,
+		cps.productquantity,
+		cpr.selling_rank
+	FROM country_product_sales cps
+	JOIN country_product_ranks cpr
+	ON cps.productsku = cpr.productsku
+	WHERE cpr.selling_rank = 1
+	ORDER BY country;
+
+City:
+
+	WITH city_product_sales AS(
+		SELECT	als.city,
+			als.productsku,
+			als.product_name,
+			als.productquantity,
+			als.productprice,
+			(als.productquantity * als.productprice) AS revenue
+		FROM all_sessions_clean als
+		WHERE productquantity IS NOT NULL
+		AND city <> 'not available in demo dataset' AND (city NOT LIKE '%not set%') AND city IS NOT NULL
+		)
+		,
+	city_product_ranks AS(
+		SELECT	cps.city,
+			cps.productsku,
+			cps.productquantity,
+			DENSE_RANK() OVER (
+			  		   PARTITION BY city 
+					   ORDER BY cps.productquantity DESC
+					  ) AS selling_rank
+		FROM city_product_sales cps
+		)
+
+	SELECT	DISTINCT(cps.city),
+			cps.productsku,
+			cps.product_name,
+			cps.productquantity,
+			cpr.selling_rank
+	FROM city_product_sales cps
+	JOIN city_product_ranks cpr
+	ON cps.productsku = cpr.productsku
+	WHERE cpr.selling_rank = 1
+	ORDER BY city;
 
 Answer:
 
-
+Most products have only been ordered once from a given country or city; there are only a few cases where a product has been ordered in a larger quantity, and this large quantity may be from a single order. However, some products (such as the Nest Thermostat and Nest Security Cameras) are the top order across several cities. 
 
 
 
