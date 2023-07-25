@@ -24,7 +24,7 @@ Working knowledge of GitHub, Git Bash, and pgAdmin4 was required.
 ### 13. Standardize and reformat data values to have consistent structure 
 ### 14. Check for duplicates
 ### 15. Create clean versions of tables (where appropriate)
-### 16. Develop queries to answer assignment questions (insert link)
+### 16. Develop queries to answer [assignment questions](/starting_with_questions.md)
 ### 17. Develop queries to answer further questions (insert link)
 ### 18. Summarize findings
 
