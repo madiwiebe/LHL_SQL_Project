@@ -18,9 +18,85 @@ When importing the raw data, VARCHAR was used as a universal data type for all c
 
 Once the tables were successfully imported into pgAdmin4, I reviewed the contents of each column and determined a suitable data type based on the type of information the column contains (e.g. a column containing 'units_sold' information should contain only integer values). 
 
-Throughout initial data exploration and data cleaning, I checked records for missing values, inconsistent formatting, unreasonable values, and duplicate values. The results of these investigations were considered when creating the "clean" versions of each table (particularly standardizing column values and removing duplicates), and missing/unreasonable values are to be especially considered when interpreting the results of queries combining different tables.
+Throughout initial data exploration and data cleaning, I checked records for missing values, inconsistent formatting, unreasonable values, and duplicate values. The results of these investigations were considered when creating the "clean" versions of each table (particularly standardizing column values and removing duplicates), and missing/unreasonable values are to be especially considered when interpreting the results of queries combining different tables. Some QA concerns remain unresolved.
+
+- Example 1: productsku investigation
+  ```
+  	--Investigate number of SKUs present in tables containing SKU values 
+		--(checked for duplicates by comparing SELECT DISTINCT() query to general SELECT() query)
+	
+		SELECT DISTINCT(sku)
+		FROM products
+		--1092 rows returned (no duplicates)
+		
+		
+		SELECT DISTINCT(productsku)
+		FROM sales_by_sku
+		--462 rows returned (no duplicates)
+		
+		
+		SELECT DISTINCT(productsku)
+		FROM sales_report
+		--454 rows returned (no duplicates)
+		
+		
+		SELECT DISTINCT(productsku)
+		FROM all_sessions;
+		--536 rows returned (but table contains duplicates)
+  ```
+  
+- Example 2: total_ordered investigation
+  ```
+  --Check for whether productsku and total_ordered records are consistent across sales_by_sku and sales_report tables, ignoring productsku values from sales_by_sku that do not have an associate productsku value in products or in sales_report
+	
+		SELECT	ss.productsku,
+				ss.total_ordered AS total_ordered_sales,
+				sr.total_ordered AS total_ordered_report
+		FROM sales_by_sku ss
+		JOIN sales_report sr
+		ON ss.productsku = sr.productsku
+		WHERE ss.total_ordered <> sr.total_ordered
+		;
+		
+		--0 rows returned.
+  ```
+  
+- Example 3: analytics time data investigation
+  ```
+  --Check whether analytics date and visitstarttime records are valid.
+	
+    SELECT "date",
+  		DATE(visitstarttime)
+    FROM analytics_clean
+    WHERE "date" <> DATE(visitstarttime);
+  --0 rows returned.
+  ```
+
+- Example 4: Check for invalid records between products.orderedquantity and products.stocklevel (stocklevel should always be higher than orderedquantity)
+  ```
+  SELECT *
+  FROM products_clean
+  WHERE stocklevel < orderedquantity;
+  --15 rows returned.
+  ```
+
+- Example 5: Investigate max and min sentimentscore values. If score represents a fraction or percentile of satisfaction, max should be 1.0 and min should be 0.0.
+  ```
+  SELECT	MAX(sentimentscore) AS maximum_score,
+		MIN(sentimentscore) AS minimum_score
+  FROM products_clean;
+  --maximum score is 1.0, minimum score is -0.6.
+  ```
+  
 
 Once cleaned, I evaluated which column (or combination of columns) contained unique information within each table. Where a unique combination relevant to the table existed, I assigned a primary key.
 
-
+- all_sessions_clean: PK = (visitid, time, productsku)
+- analytics_clean: No PK.
+- analytics_clean_sales_info: PK = rowid
+- analytics_clean_visitor_info: PK = (fullvisitorid, visitid, date)
+- product_categories_clean: no PK
+- products_clean: PK = productsku
+- sales_by_sku: PK = productsku
+- sales_report_clean: PK = productsku
 
