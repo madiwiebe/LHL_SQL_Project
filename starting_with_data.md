@@ -23,7 +23,7 @@ The top three categories with items that have not been ordered are Apparel (198)
 
 
 
-**Question 2:** What is the average amount of time a visitor spends on the website? What is the average amount of time a visitor spends on the website where they order a product?
+**Question 2:** What is the average amount of time a visitor spends on the website? What is the average amount of time a visitor spends on the website when they end up ordering a product?
 
 SQL Queries:
 
@@ -47,24 +47,22 @@ The average amount of time spent by visitors who purchase a product is 00:05:41.
 
 
 
-Question 3: 
+**Question 3:** How many visitors access the website through each type of channel? What percentage of visitors does each channel represent? 
 
 SQL Queries:
+```
+WITH cat_num AS(
+	SELECT	channelgrouping,
+		COUNT(fullvisitorid) AS num_visitors
+	FROM analytics_clean
+	GROUP BY channelgrouping)
 
+SELECT channelgrouping,
+		num_visitors,
+		TO_CHAR(num_visitors * 100 / SUM(num_visitors) OVER(), 'fm90D000%') AS percent_users
+		FROM cat_num
+		ORDER BY num_visitors DESC;
+```
 Answer:
 
-
-
-Question 4: 
-
-SQL Queries:
-
-Answer:
-
-
-
-Question 5: 
-
-SQL Queries:
-
-Answer:
+The means by which the largest percentage of users access the website is through an organic search (48.170%). The least frequent access methods are Display (0.831%) and Other (0.001%).
