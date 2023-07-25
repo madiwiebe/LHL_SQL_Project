@@ -9,24 +9,25 @@ The goal of this project was to successfully download, import, and transform the
 Working knowledge of GitHub, Git Bash, and pgAdmin4 was required.     
 
 ## Process
-### 1. Clone GitHub assignment repository to local machine
-### 2. Download provided .csv files
-### 3. Retrieve column header values from .csv files using Git Bash
-### 4. Create ecommerce database in pgAdmin4
-### 5. Create tables in pgAdmin4 corresponding to .csv filenames, having column names corresponding to .csv column headers
-### 6. Import all data as VARCHAR datatype
-### 7. Examine data and redefine columns with appropriate datatypes
-### 8. Identify shared column elements between tables
-### 9. Begin creating database ERD
-### 10. Determine primary and foreign keys (where possible)
-### 11. Assess data completeness, validity, and uniqueness
-### 12. Fill in missing data where possible
-### 13. Standardize and reformat data values to have consistent structure 
-### 14. Check for duplicates
-### 15. Create clean versions of tables (where appropriate)
-### 16. Develop queries to answer [assignment questions](/starting_with_questions.md)
-### 17. Develop queries to answer [further questions](/starting_with_data.md)
-### 18. Summarize findings
+
+1. Clone GitHub assignment repository to local machine
+2. Download provided .csv files
+3. Retrieve column header values from .csv files using Git Bash
+4. Create ecommerce database in pgAdmin4
+5. Create tables in pgAdmin4 corresponding to .csv filenames, having column names corresponding to .csv column headers
+6. Import all data as VARCHAR datatype
+7. Examine data and redefine columns with appropriate datatypes
+8. Identify shared column elements between tables
+9. Begin creating database ERD
+10. Determine primary and foreign keys (where possible)
+11. Assess data completeness, validity, and uniqueness
+12. Fill in missing data where possible
+13. Standardize and reformat data values to have consistent structure
+14. Check for duplicates
+15. Create clean versions of tables (where appropriate)
+16. Develop queries to answer [assignment questions](/starting_with_questions.md)
+17. Develop queries to answer [further questions](/starting_with_data.md)
+18. Summarize findings
 
 ## Results
 (fill in what you discovered this data could tell you and how you used the data to answer those questions)
