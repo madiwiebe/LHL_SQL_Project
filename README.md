@@ -30,7 +30,11 @@ Working knowledge of GitHub, Git Bash, and pgAdmin4 was required.
 18. Summarize findings
 
 ## Results
-(fill in what you discovered this data could tell you and how you used the data to answer those questions)
+
+This type of database provides website traffic info. Information about users (e.g. location, time spent on site, date accessed, means of access, number of pages viewed) and products (product SKUs, item category, quantity sold, unit price) are able to be combined to analyze which users are purchasing which products, as well as overall sales patterns. This type of database is powerful for marketing and advertising.
+
+I used the database to determine which cities and countries generated the most web traffic and the most revenue from the website by combining user location and session data with calculated revenue data from the all_sessions_clean table. By creating a function to standardize product category labels as well as assign them subcategories, I was able to identify which category of products each region ordered from the most. I used date information to investigate whether there was enough data to analyze annual revenue increase or decrease by region. With further exploration of product and sales information, I examined which products are the least popular, the relationship between the time spent on the website and a transaction event, as well as what the most common means of accessing the website is. 
+
 
 ## Challenges 
 
@@ -44,8 +48,10 @@ The fourth and final challenge was in deciding what to focus on! There were so m
 
 ## Future Goals
 
-I would like to restructure the database to make each table simpler and to better distinguish the various facts and dimensions. I started to separate components of the analytics table, but I feel that more work can be done there.
+I would like to restructure the database to make each table simpler and to better distinguish the various facts and dimensions. I started to separate components of the analytics table, but I feel that more work can be done there. Similarly, although I defined a multi-column primary key for all_sessions_clean (fullvisitorid, visitid, productsku), there are still 5 instances where there are non-unique values for that key.
 
 I would also like to consolidate and unify product-related information, namely SKU values and unit price values. Many records do not agree with each other, and creating a product facts table which other tables may refer to would help increase the integrity of this database.
 
-Further exploration of the website user data would also be interesting to me. Investigating the relationship between timeonsite, pageviews, bounces, and units_sold would be worthwhile, and I believe that data for how a user reached the website is also available in channelgrouping.  
+I would like to have better understanding the various date/time columns; in particular, all_sessions_clean.time has an unknown significance to me. 
+
+Further exploration of the website user data would also be interesting to me. Investigating the relationship between channelgrouping and timeonsite would be useful for finding the best way to promote the website. Analyzing how user experiences may be variable across regions by relating bounce rates, page views, and location may help to optimize web delivery.
