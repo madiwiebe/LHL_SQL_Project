@@ -7,7 +7,7 @@ What issues will you address by cleaning the data?
 3. Create new tables from analytics table that contain more specific and simplified information. 
        - Table containing sales information
        - Table containing visitor information
-    Row_number column added to preserve data integrity.
+    Row_number column added to preserve data integrity across analytics_clean, analytics_clean_sales_info, and analytics_clean_visitor_info.
 
 4. Check for duplicates.
   
@@ -137,3 +137,26 @@ Below, provide the SQL queries you used to clean your data.
     FROM sales_report;
 
 
+Generic structure of queries used to check for duplicates in tables/columns:
+
+--check for total number of rows in the table.
+
+	SELECT COUNT(*)
+	FROM table.name
+
+--check for duplicates across multiple columns within a table.
+
+	SELECT	column_1,
+		column_2,
+ 		column_3,
+  		COUNT(*)
+   	FROM table.name
+    	GROUP BY column_1, column_2, column_3
+	HAVING COUNT(*) > 1
+
+--check for number of distinct values within a single column. Compare this value with total number of rows in the table.
+
+	SELECT COUNT(DISTINCT(column_name)
+	FROM table.name
+
+ 
