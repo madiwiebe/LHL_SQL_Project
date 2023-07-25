@@ -18,7 +18,7 @@ Working knowledge of GitHub, Git Bash, and pgAdmin4 was required.
 6. Import all data as VARCHAR datatype
 7. Examine data and redefine columns with appropriate datatypes
 8. Identify shared column elements between tables
-9. Begin creating database ERD
+9. Begin creating [database ERD](https://miro.com/app/live-embed/uXjVM1hMeYQ=/?moveToViewport=-1436,211,4468,2018&embedId=281970049829) 
 10. Determine primary and foreign keys (where possible)
 11. Assess data completeness, validity, and uniqueness
 12. Fill in missing data where possible
